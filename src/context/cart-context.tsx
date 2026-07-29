@@ -4,12 +4,14 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 import { CartItem } from "@/lib/types";
 import { products } from "@/lib/data/products";
 import { initialCartProductIds } from "@/lib/data/mock-state";
+import { readStorage, writeStorage } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface CartContextValue {
@@ -25,7 +27,11 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(initialCartProductIds);
+  const [items, setItems] = useState<CartItem[]>(() => readStorage<CartItem[]>("novacart-cart", initialCartProductIds));
+
+  useEffect(() => {
+    writeStorage("novacart-cart", items);
+  }, [items]);
 
   const addToCart = useCallback((productId: string, quantity: number = 1) => {
     const product = products.find((p) => p.id === productId);

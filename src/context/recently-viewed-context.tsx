@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { recentlyViewedProductIds } from "@/lib/data/mock-state";
+import { readStorage, writeStorage } from "@/lib/utils";
 
 interface RecentlyViewedContextValue {
   productIds: string[];
@@ -13,7 +14,11 @@ const RecentlyViewedContext = createContext<RecentlyViewedContextValue | undefin
 const MAX_ITEMS = 10;
 
 export function RecentlyViewedProvider({ children }: { children: React.ReactNode }) {
-  const [productIds, setProductIds] = useState<string[]>(recentlyViewedProductIds);
+  const [productIds, setProductIds] = useState<string[]>(() => readStorage<string[]>("novacart-recently-viewed", recentlyViewedProductIds));
+
+  useEffect(() => {
+    writeStorage("novacart-recently-viewed", productIds);
+  }, [productIds]);
 
   const addProduct = useCallback((productId: string) => {
     setProductIds((prev) => [productId, ...prev.filter((id) => id !== productId)].slice(0, MAX_ITEMS));

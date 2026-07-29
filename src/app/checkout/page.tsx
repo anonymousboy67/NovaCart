@@ -64,7 +64,18 @@ export default function CheckoutPage() {
       <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Cart", href: "/cart" }, { label: "Checkout" }]} />
       <h1 className="mb-8 mt-3 text-2xl font-bold text-foreground md:text-3xl">Checkout</h1>
 
-      <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+      {lines.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card p-8 text-center">
+          <p className="text-lg font-semibold text-foreground">Your cart is empty</p>
+          <p className="mt-2 text-sm text-foreground-secondary">
+            Add a few favorites first, then come back here to complete your order.
+          </p>
+          <Button className="mt-5" onClick={() => router.push("/products")}>
+            Browse products
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
         <div className="flex flex-col gap-6">
           <section className="rounded-xl border border-border bg-card p-6">
             <div className="mb-5 flex items-center justify-between">
@@ -201,7 +212,8 @@ export default function CheckoutPage() {
             }
           />
         </div>
-      </div>
+        </div>
+      )}
 
       <Dialog open={placed} onOpenChange={(open) => !open && handleCloseSuccess()}>
         <DialogContent className="text-center">

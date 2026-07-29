@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { products } from "@/lib/data/products";
 import { initialWishlistProductIds } from "@/lib/data/mock-state";
+import { readStorage, writeStorage } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface WishlistContextValue {
@@ -16,7 +17,11 @@ interface WishlistContextValue {
 const WishlistContext = createContext<WishlistContextValue | undefined>(undefined);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  const [productIds, setProductIds] = useState<string[]>(initialWishlistProductIds);
+  const [productIds, setProductIds] = useState<string[]>(() => readStorage<string[]>("novacart-wishlist", initialWishlistProductIds));
+
+  useEffect(() => {
+    writeStorage("novacart-wishlist", productIds);
+  }, [productIds]);
 
   const isWishlisted = useCallback(
     (productId: string) => productIds.includes(productId),

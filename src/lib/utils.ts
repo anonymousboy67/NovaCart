@@ -38,3 +38,20 @@ export function discountPercent(price: number, originalPrice?: number) {
 export function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
+
+export function readStorage<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export function writeStorage<T>(key: string, value: T) {
+  if (typeof window === "undefined") return;
+
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
