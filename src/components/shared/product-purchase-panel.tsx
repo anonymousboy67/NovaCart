@@ -112,7 +112,10 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-xl bg-background-secondary p-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-border/70 bg-background-secondary p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-foreground-secondary">
+          Why shoppers love it
+        </p>
         <div className="flex items-center gap-3 text-sm text-foreground-secondary">
           <Truck className="h-4 w-4 shrink-0 text-primary" />
           Free shipping on orders over $50

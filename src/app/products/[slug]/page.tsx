@@ -49,7 +49,7 @@ export default async function ProductDetailsPage({
         ]}
       />
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-2 lg:gap-14">
+      <div className="mt-6 grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
         <ProductGallery images={product.images} alt={product.name} />
         <ProductPurchasePanel product={product} />
       </div>
