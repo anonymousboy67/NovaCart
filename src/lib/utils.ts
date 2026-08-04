@@ -5,12 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPrice(value: number, currency: string = "USD") {
-  return new Intl.NumberFormat("en-US", {
+export function formatPrice(value: number, currency: string = "NPR") {
+  // Convert USD to NPR (approximate rate: 1 USD = 133 NPR)
+  const nprValue = value * 133;
+
+  return new Intl.NumberFormat("ne-NP", {
     style: "currency",
-    currency,
-    maximumFractionDigits: value % 1 === 0 ? 0 : 2,
-  }).format(value);
+    currency: "NPR",
+    maximumFractionDigits: 0,
+  }).format(nprValue);
 }
 
 export function formatDate(date: string | Date) {

@@ -3,6 +3,7 @@ export interface Category {
   name: string;
   slug: string;
   icon: string; // phosphor-icons/react icon name
+  image?: string; // category image URL
   productCount: number;
   description: string;
 }

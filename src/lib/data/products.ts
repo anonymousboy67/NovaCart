@@ -21,8 +21,276 @@ interface RawProduct {
   colors?: string[];
 }
 
+// Map product IDs to real product-specific images from Unsplash
+const productImageMap: Record<string, string[]> = {
+  // Electronics - Real tech product images
+  "p-electronics-01": [ // Wireless Headphones
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=900&h=900&fit=crop",
+  ],
+  "p-electronics-02": [ // Laptop
+    "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=900&h=900&fit=crop",
+  ],
+  "p-electronics-03": [ // Smartwatch
+    "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1434494878577-86c23bcb06b9?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1544117519-31a4b719223d?w=900&h=900&fit=crop",
+  ],
+  "p-electronics-04": [ // TV
+    "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1593359863503-f598bb5370bc?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1567690187548-f07b1d7bf5a9?w=900&h=900&fit=crop",
+  ],
+  "p-electronics-05": [ // Charger
+    "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1591290619762-9f3a6e092b9b?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1625948515291-69613efd103f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1601524909162-ae8725290836?w=900&h=900&fit=crop",
+  ],
+  "p-electronics-06": [ // Smart Speaker
+    "https://images.unsplash.com/photo-1543512214-318c7553f230?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1519558260268-cde7e03a0152?w=900&h=900&fit=crop",
+  ],
+  "p-electronics-07": [ // Camera
+    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1606980707748-8b1149a75b8e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=900&h=900&fit=crop",
+  ],
+  "p-electronics-08": [ // Mechanical Keyboard
+    "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1595225476474-87563907a212?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=900&h=900&fit=crop",
+  ],
+
+  // Fashion - Real fashion product images
+  "p-fashion-01": [ // Wool Overcoat
+    "https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1548883354-7622d03aca27?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1608748010899-18f300247112?w=900&h=900&fit=crop",
+  ],
+  "p-fashion-02": [ // Sneakers
+    "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&h=900&fit=crop",
+  ],
+  "p-fashion-03": [ // Silk Blouse
+    "https://images.unsplash.com/photo-1578342976795-062a1b744f37?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1624206112918-f140f087f9db?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=900&h=900&fit=crop",
+  ],
+  "p-fashion-04": [ // Canvas Bag
+    "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=900&h=900&fit=crop",
+  ],
+  "p-fashion-05": [ // Merino Sweater
+    "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1581338834647-b0fb40704e21?w=900&h=900&fit=crop",
+  ],
+  "p-fashion-06": [ // Sunglasses
+    "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1577803645773-f96470509666?w=900&h=900&fit=crop",
+  ],
+
+  // Home & Living - Real home product images
+  "p-home-01": [ // Armchair
+    "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=900&h=900&fit=crop",
+  ],
+  "p-home-02": [ // Dinnerware Set
+    "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=900&h=900&fit=crop",
+  ],
+  "p-home-03": [ // Table Lamp
+    "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1509643244853-40b26d87ce9f?w=900&h=900&fit=crop",
+  ],
+  "p-home-04": [ // Weighted Throw
+    "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=900&h=900&fit=crop",
+  ],
+  "p-home-05": [ // Pour-Over Coffee Set
+    "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1511920170033-f8396924c348?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=900&h=900&fit=crop",
+  ],
+  "p-home-06": [ // Ceramic Planters
+    "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1466781783364-36c955e42a7f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1459156212016-c812468e2115?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1520699697851-3dc68aa3a474?w=900&h=900&fit=crop",
+  ],
+
+  // Beauty - Real beauty product images
+  "p-beauty-01": [ // Vitamin C Serum
+    "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1556229010-aa49cf849c3d?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1570554886111-e80fcca6a029?w=900&h=900&fit=crop",
+  ],
+  "p-beauty-02": [ // Night Cream
+    "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1612817288484-6f916006741a?w=900&h=900&fit=crop",
+  ],
+  "p-beauty-03": [ // Perfume
+    "https://images.unsplash.com/photo-1541643600914-78b084683601?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=900&h=900&fit=crop",
+  ],
+  "p-beauty-04": [ // Hair Brush
+    "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1580870069867-74c57ee1bb07?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1607748862156-7c548e7e98f4?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1596704017254-9b121068fe31?w=900&h=900&fit=crop",
+  ],
+  "p-beauty-05": [ // Sunscreen
+    "https://images.unsplash.com/photo-1621607512214-68297480165e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1570554886111-e80fcca6a029?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1617897903246-719242758050?w=900&h=900&fit=crop",
+  ],
+
+  // Sports & Outdoors - Real sports product images
+  "p-sports-01": [ // Trail Running Shoes
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1585658388426-032d6e0d5a87?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=900&h=900&fit=crop",
+  ],
+  "p-sports-02": [ // Camping Tent
+    "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1537565732966-3e5d0ff44f01?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1445308394109-4ec2920981b1?w=900&h=900&fit=crop",
+  ],
+  "p-sports-03": [ // Dumbbells
+    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1574680178050-55c6a6a96e0a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1517344884509-a0c97ec11bcc?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1599058917212-d750089bc07e?w=900&h=900&fit=crop",
+  ],
+  "p-sports-04": [ // Puffer Vest
+    "https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1602452715162-bc9d23fdc08a?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?w=900&h=900&fit=crop",
+  ],
+  "p-sports-05": [ // Water Bottle
+    "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1567690187548-f07b1d7bf5a9?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1624649589146-37ffb87e4d00?w=900&h=900&fit=crop",
+  ],
+
+  // Books - Real book images
+  "p-books-01": [ // Novel
+    "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=900&h=900&fit=crop",
+  ],
+  "p-books-02": [ // Cookbook
+    "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1593260797177-ce12c7d8ff15?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1600096194735-ec70c6d49a8d?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=900&h=900&fit=crop",
+  ],
+  "p-books-03": [ // Productivity Book
+    "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=900&h=900&fit=crop",
+  ],
+  "p-books-04": [ // Fiction Novel
+    "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=900&h=900&fit=crop",
+  ],
+
+  // Groceries - Real food product images
+  "p-groceries-01": [ // Coffee Beans
+    "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&h=900&fit=crop",
+  ],
+  "p-groceries-02": [ // Olive Oil
+    "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1608684421919-0e5e1e5a46e0?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1594498653385-d5172c532c00?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1632834407995-c8db01e4bfb1?w=900&h=900&fit=crop",
+  ],
+  "p-groceries-03": [ // Honey
+    "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1576673442511-7e39b6545c87?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1587049352851-8d492a2aee7c?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1471943311424-646960669fbc?w=900&h=900&fit=crop",
+  ],
+
+  // Pets - Real pet product images
+  "p-pets-01": [ // Dog Bed
+    "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1598133893773-de3574464ef0?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=900&h=900&fit=crop",
+  ],
+  "p-pets-02": [ // Cat Tree
+    "https://images.unsplash.com/photo-1545249390-6bdfa286032f?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1611915387288-fd8d2f5f928b?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?w=900&h=900&fit=crop",
+  ],
+  "p-pets-03": [ // Dog Harness
+    "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1601758125946-6ec2ef64daf8?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1534361960057-19889db9621e?w=900&h=900&fit=crop",
+    "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=900&h=900&fit=crop",
+  ],
+};
+
 function productImages(id: string, count: number = 4): string[] {
-  return Array.from({ length: count }, (_, i) => `https://picsum.photos/seed/novacart-${id}-${i}/900/900`);
+  const images = productImageMap[id];
+
+  if (!images) {
+    // Fallback for any missing products
+    return Array.from({ length: count }, (_, i) =>
+      `https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=900&h=900&fit=crop&sig=${i}`
+    );
+  }
+
+  return images.slice(0, count);
 }
 
 const raw: RawProduct[] = [
