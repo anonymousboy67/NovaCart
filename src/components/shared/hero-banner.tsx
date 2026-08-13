@@ -4,88 +4,99 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ShoppingBag, Sparkle, Star, Tag, TrendUp } from "@phosphor-icons/react/ssr";
+import { ArrowRight, Sparkle, Star, TrendUp, Tag } from "@phosphor-icons/react/ssr";
 import { Button } from "@/components/ui/button";
 
+type BadgeType = "new" | "discount" | "trending" | "bestseller";
+
+interface HeroProduct {
+  image: string;
+  name: string;
+  category: string;
+  price: string;
+  originalPrice?: string;
+  badge: {
+    type: BadgeType;
+    label: string;
+  };
+}
+
 export function HeroBanner() {
-  const [currentProductSet, setCurrentProductSet] = useState(0);
-  const [centerProductIndex, setCenterProductIndex] = useState(0);
+  const [currentProductIndex, setCurrentProductIndex] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Featured center products that rotate
-  const centerProducts = [
-    { image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop", name: "Premium Headphones", color: "from-purple-500 to-pink-500" },
-    { image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop", name: "Smart Watch", color: "from-blue-500 to-cyan-500" },
-    { image: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=500&h=500&fit=crop", name: "Designer Sneakers", color: "from-orange-500 to-red-500" },
-    { image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&h=500&fit=crop", name: "Pro Camera", color: "from-green-500 to-emerald-500" },
+  // Hero products that rotate
+  const heroProducts: HeroProduct[] = [
+    {
+      image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=800&h=800&fit=crop&q=80",
+      name: "Premium Wireless Headphones",
+      category: "Electronics",
+      price: "Rs. 23,807",
+      originalPrice: "Rs. 47,614",
+      badge: { type: "discount", label: "50% OFF" },
+    },
+    {
+      image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&h=800&fit=crop&q=80",
+      name: "Smart Watch Series 9",
+      category: "Electronics",
+      price: "Rs. 53,200",
+      badge: { type: "new", label: "NEW" },
+    },
+    {
+      image: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=800&h=800&fit=crop&q=80",
+      name: "Designer Running Shoes",
+      category: "Fashion",
+      price: "Rs. 15,960",
+      badge: { type: "trending", label: "TRENDING" },
+    },
+    {
+      image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&h=800&fit=crop&q=80",
+      name: "Professional DSLR Camera",
+      category: "Electronics",
+      price: "Rs. 1,72,767",
+      originalPrice: "Rs. 2,15,959",
+      badge: { type: "discount", label: "25% OFF" },
+    },
   ];
 
-  // Multiple sets of products that will rotate
-  const productSets = [
-    [
-      { image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop", name: "Wireless Headphones", badge: "50% OFF", color: "from-purple-500 to-pink-500" },
-      { image: "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=400&h=400&fit=crop", name: "Smartwatch", badge: "NEW", color: "from-blue-500 to-cyan-500" },
-      { image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop", name: "Sneakers", badge: "TRENDING", color: "from-orange-500 to-red-500" },
-      { image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=400&fit=crop", name: "Camera", badge: "HOT", color: "from-green-500 to-emerald-500" },
-    ],
-    [
-      { image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop", name: "Laptop", badge: "SALE", color: "from-indigo-500 to-purple-500" },
-      { image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=400&h=400&fit=crop", name: "Perfume", badge: "NEW", color: "from-pink-500 to-rose-500" },
-      { image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=400&fit=crop", name: "Armchair", badge: "20% OFF", color: "from-amber-500 to-orange-500" },
-      { image: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&h=400&fit=crop", name: "Coffee Set", badge: "BESTSELLER", color: "from-teal-500 to-cyan-500" },
-    ],
-    [
-      { image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&h=400&fit=crop", name: "Sunglasses", badge: "TRENDING", color: "from-yellow-500 to-amber-500" },
-      { image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop", name: "Dumbbells", badge: "NEW", color: "from-red-500 to-pink-500" },
-      { image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop", name: "Travel Bag", badge: "HOT", color: "from-violet-500 to-purple-500" },
-      { image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop", name: "Serum", badge: "SALE", color: "from-sky-500 to-blue-500" },
-    ],
+  // Supporting callout badges
+  const supportingBadges = [
+    { icon: Tag, label: "Up to 50% OFF", description: "On selected items", type: "discount" as BadgeType },
+    { icon: Sparkle, label: "New Arrivals", description: "Fresh picks daily", type: "new" as BadgeType },
+    { icon: TrendUp, label: "Trending Now", description: "What's popular", type: "trending" as BadgeType },
   ];
 
-  // Auto-rotate products every 4 seconds
+  // Auto-rotate hero product every 5 seconds with smooth transitions
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentProductSet((prev) => (prev + 1) % productSets.length);
-    }, 4000);
+      setCurrentProductIndex((prev) => (prev + 1) % heroProducts.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [heroProducts.length]);
 
-  // Auto-rotate center product every 3 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCenterProductIndex((prev) => (prev + 1) % centerProducts.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
+  // Track mouse position for parallax effect
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePosition({ x, y });
+  };
 
-  const floatingProducts = productSets[currentProductSet];
+  const currentProduct = heroProducts[currentProductIndex];
 
-  // Geometric shapes for background
-  const geometricShapes = [
-    { type: "circle", size: 40, x: 10, y: 15, delay: 0 },
-    { type: "square", size: 30, x: 85, y: 20, delay: 0.5 },
-    { type: "triangle", size: 35, x: 15, y: 80, delay: 1 },
-    { type: "circle", size: 25, x: 90, y: 75, delay: 1.5 },
-  ];
-
-  // Floating particles
-  const particles = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 4 + 2,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    delay: Math.random() * 3,
-    duration: Math.random() * 10 + 10,
-  }));
-
-  // Sparkles
-  const sparkles = Array.from({ length: 12 }, (_, i) => ({
-    id: i,
-    size: Math.random() * 8 + 4,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    delay: Math.random() * 2,
-    duration: Math.random() * 3 + 2,
-  }));
+  // Get badge styling based on type - matching product card colors
+  const getBadgeStyles = (type: BadgeType) => {
+    switch (type) {
+      case "discount":
+        return "bg-error/10 text-error border-error/20"; // Red - matches product card discount
+      case "new":
+        return "bg-primary text-primary-foreground border-primary/20"; // Navy - matches product card "New"
+      case "trending":
+        return "bg-accent text-accent-foreground border-accent/20"; // Accent color for trending
+      case "bestseller":
+        return "bg-success/10 text-success border-success/20"; // Green for bestseller
+    }
+  };
 
   return (
     <section className="relative border-b border-border bg-gradient-to-br from-background via-background-secondary to-background overflow-hidden">
@@ -116,65 +127,32 @@ export function HeroBanner() {
         }}
       />
 
-      {/* Geometric shapes background */}
-      {geometricShapes.map((shape, i) => (
+      {/* Floating particles - using fixed positions to avoid hydration mismatch */}
+      {[
+        { size: 4, left: 10, top: 20, duration: 15, delay: 0 },
+        { size: 3, left: 25, top: 60, duration: 18, delay: 0.5 },
+        { size: 5, left: 45, top: 15, duration: 20, delay: 1 },
+        { size: 2.5, left: 60, top: 75, duration: 16, delay: 1.5 },
+        { size: 4.5, left: 75, top: 30, duration: 19, delay: 2 },
+        { size: 3.5, left: 15, top: 80, duration: 17, delay: 0.3 },
+        { size: 4, left: 85, top: 50, duration: 21, delay: 0.8 },
+        { size: 3, left: 35, top: 40, duration: 18, delay: 1.2 },
+        { size: 5, left: 90, top: 10, duration: 16, delay: 2.5 },
+        { size: 2.5, left: 50, top: 90, duration: 20, delay: 0.6 },
+        { size: 4, left: 5, top: 45, duration: 19, delay: 1.8 },
+        { size: 3.5, left: 70, top: 85, duration: 17, delay: 1.1 },
+        { size: 4.5, left: 40, top: 25, duration: 22, delay: 0.4 },
+        { size: 3, left: 80, top: 65, duration: 18, delay: 2.2 },
+        { size: 5, left: 20, top: 55, duration: 16, delay: 0.9 },
+      ].map((particle, i) => (
         <motion.div
-          key={`shape-${i}`}
-          className="absolute opacity-10"
-          style={{
-            left: `${shape.x}%`,
-            top: `${shape.y}%`,
-          }}
-          initial={{ opacity: 0, scale: 0, rotate: 0 }}
-          animate={{
-            opacity: [0.1, 0.2, 0.1],
-            scale: [1, 1.2, 1],
-            rotate: [0, 180, 360],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            delay: shape.delay,
-            ease: "easeInOut",
-          }}
-        >
-          {shape.type === "circle" && (
-            <div
-              className="rounded-full border-2 border-primary"
-              style={{ width: shape.size, height: shape.size }}
-            />
-          )}
-          {shape.type === "square" && (
-            <div
-              className="border-2 border-accent rotate-45"
-              style={{ width: shape.size, height: shape.size }}
-            />
-          )}
-          {shape.type === "triangle" && (
-            <div
-              className="border-l-2 border-r-2 border-b-2 border-primary"
-              style={{
-                width: 0,
-                height: 0,
-                borderLeft: `${shape.size / 2}px solid transparent`,
-                borderRight: `${shape.size / 2}px solid transparent`,
-                borderBottom: `${shape.size}px solid currentColor`,
-              }}
-            />
-          )}
-        </motion.div>
-      ))}
-
-      {/* Floating particles */}
-      {particles.map((particle) => (
-        <motion.div
-          key={`particle-${particle.id}`}
+          key={`particle-${i}`}
           className="absolute rounded-full bg-primary/20"
           style={{
             width: particle.size,
             height: particle.size,
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
           }}
           animate={{
             y: [0, -100, 0],
@@ -212,14 +190,14 @@ export function HeroBanner() {
             <Sparkle weight="fill" className="w-3 h-3" />
             New Season Arrivals
           </motion.span>
-          <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight text-foreground md:text-5xl">
+          <h1 className="font-display text-4xl font-semibold leading-[1.1] tracking-tight text-foreground md:text-5xl lg:text-6xl">
             Everyday essentials,
             <br />
             thoughtfully curated.
           </h1>
-          <p className="max-w-md text-base leading-relaxed text-foreground-secondary">
+          <p className="max-w-md text-base leading-relaxed text-foreground-secondary md:text-lg">
             Discover electronics, fashion, home and beauty picks chosen for quality — not
-            just quantity. Free shipping on orders over $50.
+            just quantity. Free shipping on orders over Rs. 6,650.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Button size="lg" asChild>
@@ -249,7 +227,7 @@ export function HeroBanner() {
               className="flex items-center gap-2 rounded-xl bg-card/50 backdrop-blur-sm px-4 py-3 border border-border"
               whileHover={{ scale: 1.05 }}
             >
-              <TrendUp weight="fill" className="w-5 h-5 text-green-500" />
+              <TrendUp weight="fill" className="w-5 h-5 text-success" />
               <div>
                 <div className="text-sm font-semibold">50K+</div>
                 <div className="text-xs text-foreground-secondary">Products</div>
@@ -258,356 +236,278 @@ export function HeroBanner() {
           </div>
         </motion.div>
 
-        {/* Animated product showcase */}
-        <div className="relative aspect-square md:aspect-[4/3] overflow-visible">
-          {/* Central glow effect */}
+        {/* Hero product showcase - clean, single product focus */}
+        <div
+          className="relative aspect-square flex items-center justify-center"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setMousePosition({ x: 0, y: 0 })}
+        >
+          {/* Central glow effect with parallax */}
           <motion.div
-            className="absolute inset-0 flex items-center justify-center"
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
+            style={{
+              x: mousePosition.x * 20,
+              y: mousePosition.y * 20,
+            }}
           >
             <motion.div
-              className="w-96 h-96 md:w-[500px] md:h-[500px] bg-gradient-to-r from-primary/30 via-accent/30 to-primary/30 rounded-full blur-3xl"
+              className="w-[400px] h-[400px] md:w-[500px] md:h-[500px] bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-full blur-3xl"
               animate={{
                 scale: [1, 1.15, 1],
                 rotate: [0, 180, 360],
               }}
               transition={{
-                duration: 10,
-                repeat: Infinity,
-                ease: "linear",
+                scale: {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                },
+                rotate: {
+                  duration: 20,
+                  repeat: Infinity,
+                  ease: "linear",
+                },
               }}
             />
           </motion.div>
 
-          {/* Floating product images with AnimatePresence for smooth transitions */}
+          {/* Main hero product with 3D tilt effect */}
           <AnimatePresence mode="wait">
-            {floatingProducts.map((product, index) => {
-              const angle = (index / floatingProducts.length) * Math.PI * 2;
-              const radius = 170; // Increased from 130
-              const x = Math.cos(angle) * radius;
-              const y = Math.sin(angle) * radius;
-
-              return (
+            <motion.div
+              key={currentProductIndex}
+              className="relative z-10"
+              initial={{ opacity: 0, scale: 0.8, rotateX: -15 }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                rotateX: 0,
+                rotateY: mousePosition.x * 10,
+                rotateZ: mousePosition.x * -5,
+              }}
+              exit={{ opacity: 0, scale: 0.8, rotateX: 15 }}
+              transition={{
+                duration: 0.8,
+                type: "spring",
+                bounce: 0.3,
+                rotateY: { type: "spring", stiffness: 100, damping: 20 },
+                rotateZ: { type: "spring", stiffness: 100, damping: 20 },
+              }}
+              style={{
+                transformStyle: "preserve-3d",
+                perspective: 1000,
+              }}
+            >
+              <div className="relative w-[280px] h-[280px] md:w-[360px] md:h-[360px] lg:w-[420px] lg:h-[420px]">
+                {/* Product card with smooth animations */}
                 <motion.div
-                  key={`${currentProductSet}-${index}`}
-                  className="absolute left-1/2 top-1/2"
-                  initial={{ opacity: 0, scale: 0, rotate: -180 }}
+                  className="relative w-full h-full rounded-3xl overflow-hidden bg-card shadow-2xl border-2 border-border group cursor-pointer"
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0 30px 60px rgba(0,0,0,0.3)",
+                  }}
                   animate={{
-                    opacity: 1,
-                    scale: 1,
-                    rotate: 0,
-                    x: [x, x + 10, x],
-                    y: [y, y - 10, y],
+                    y: [0, -10, 0],
                   }}
-                  exit={{ opacity: 0, scale: 0, rotate: 180 }}
                   transition={{
-                    opacity: { duration: 0.5 },
-                    scale: { duration: 0.5, type: "spring" },
-                    rotate: { duration: 0.5 },
-                    x: {
-                      delay: 0.5,
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    },
+                    scale: { type: "spring", stiffness: 300 },
                     y: {
-                      delay: 0.5,
                       duration: 3,
                       repeat: Infinity,
                       ease: "easeInOut",
                     },
-                  }}
-                  style={{
-                    marginLeft: -75,
-                    marginTop: -75,
                   }}
                 >
+                  {/* Animated shine effect overlay */}
                   <motion.div
-                    className="relative group cursor-pointer"
-                    whileHover={{ scale: 1.15, rotate: 5, zIndex: 50 }}
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                     animate={{
-                      rotate: [0, 3, 0, -3, 0],
+                      x: ["-100%", "200%"],
                     }}
                     transition={{
-                      rotate: {
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      },
+                      duration: 3,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      ease: "easeInOut",
                     }}
-                  >
-                    {/* Product card */}
-                    <div className="relative w-36 h-36 md:w-40 md:h-40 rounded-2xl overflow-hidden shadow-2xl ring-4 ring-white/30 backdrop-blur-sm">
-                      <Image
-                        src={product.image}
-                        alt={product.name}
-                        fill
-                        sizes="160px"
-                        className="object-cover transition-transform duration-300 group-hover:scale-110"
-                      />
-                      {/* Gradient overlay */}
-                      <div className={`absolute inset-0 bg-gradient-to-br ${product.color} opacity-0 group-hover:opacity-20 transition-opacity duration-300`} />
-                    </div>
+                  />
 
-                    {/* Badge */}
-                    <motion.div
-                      className={`absolute -top-3 -right-3 rounded-full bg-gradient-to-br ${product.color} px-3 py-1.5 text-xs font-bold text-white shadow-lg flex items-center gap-1`}
-                      initial={{ scale: 0, rotate: -45 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.3, type: "spring" }}
-                    >
-                      <Tag weight="fill" className="w-3 h-3" />
-                      {product.badge}
-                    </motion.div>
+                  <Image
+                    src={currentProduct.image}
+                    alt={currentProduct.name}
+                    fill
+                    sizes="(max-width: 768px) 280px, (max-width: 1024px) 360px, 420px"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    priority
+                  />
 
-                    {/* Product name tooltip */}
+                  {/* Gradient overlay at bottom */}
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+
+                  {/* Product info */}
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                     <motion.div
-                      className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      initial={{ y: -10 }}
-                      whileHover={{ y: 0 }}
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="flex flex-col gap-2"
                     >
-                      <div className="bg-card/90 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-medium shadow-lg border border-border">
-                        {product.name}
+                      <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">
+                        {currentProduct.category}
+                      </span>
+                      <h3 className="text-xl md:text-2xl font-bold leading-tight">
+                        {currentProduct.name}
+                      </h3>
+                      <div className="flex items-baseline gap-3 mt-1">
+                        <span className="text-2xl md:text-3xl font-bold">{currentProduct.price}</span>
+                        {currentProduct.originalPrice && (
+                          <span className="text-sm text-white/60 line-through">
+                            {currentProduct.originalPrice}
+                          </span>
+                        )}
                       </div>
                     </motion.div>
+                  </div>
+
+                  {/* Main badge - top left with consistent colors */}
+                  <motion.div
+                    className={`absolute top-4 left-4 rounded-lg px-3 py-1.5 text-xs font-bold shadow-lg border backdrop-blur-sm ${getBadgeStyles(currentProduct.badge.type)}`}
+                    initial={{ scale: 0, x: -20 }}
+                    animate={{ scale: 1, x: 0 }}
+                    transition={{ delay: 0.3, type: "spring" }}
+                  >
+                    {currentProduct.badge.label}
                   </motion.div>
+
+                  {/* Shine effect on hover */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-0 group-hover:opacity-10 pointer-events-none"
+                    initial={{ x: "-100%", y: "-100%" }}
+                    whileHover={{ x: "100%", y: "100%" }}
+                    transition={{ duration: 0.6 }}
+                  />
                 </motion.div>
-              );
-            })}
-          </AnimatePresence>
 
-          {/* Orbiting rings */}
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={`orbit-${i}`}
-              className="absolute left-1/2 top-1/2 w-2 h-2"
-              animate={{
-                rotate: 360,
-              }}
-              transition={{
-                duration: 8 + i * 2,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              style={{
-                marginLeft: -2,
-                marginTop: -2,
-              }}
-            >
-              <motion.div
-                className="w-4 h-4 rounded-full bg-gradient-to-r from-primary to-accent"
-                style={{
-                  x: 120 + i * 35,
-                }}
-                animate={{
-                  scale: [1, 1.5, 1],
-                  opacity: [0.4, 1, 0.4],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            </motion.div>
-          ))}
-
-          {/* Sparkle effects */}
-          {sparkles.map((sparkle) => (
-            <motion.div
-              key={`sparkle-${sparkle.id}`}
-              className="absolute"
-              style={{
-                left: `${sparkle.x}%`,
-                top: `${sparkle.y}%`,
-              }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{
-                opacity: [0, 1, 0],
-                scale: [0, 1, 0],
-                rotate: [0, 180, 360],
-              }}
-              transition={{
-                duration: sparkle.duration,
-                repeat: Infinity,
-                delay: sparkle.delay,
-                ease: "easeInOut",
-              }}
-            >
-              <Sparkle
-                className="text-primary"
-                size={sparkle.size}
-                weight="fill"
-              />
-            </motion.div>
-          ))}
-
-          {/* Center featured product with rotation */}
-          <motion.div
-            className="absolute left-1/2 top-1/2 -ml-24 -mt-24"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8, duration: 0.5, type: "spring" }}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={centerProductIndex}
-                className="relative w-48 h-48 md:w-52 md:h-52"
-                initial={{ opacity: 0, scale: 0.8, rotate: -180 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 0.8, rotate: 180 }}
-                transition={{ duration: 0.6, type: "spring" }}
-              >
-                {/* Outer rotating ring */}
+                {/* Floating ring decoration with particles */}
                 <motion.div
-                  className={`absolute inset-0 rounded-full bg-gradient-to-r ${centerProducts[centerProductIndex].color} opacity-20 blur-xl`}
+                  className="absolute -inset-6 rounded-full border-2 border-primary/30 pointer-events-none"
                   animate={{
-                    scale: [1, 1.1, 1],
-                    rotate: 360,
+                    rotate: [0, 360],
+                    scale: [1, 1.08, 1],
                   }}
                   transition={{
-                    scale: {
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    },
                     rotate: {
                       duration: 8,
                       repeat: Infinity,
                       ease: "linear",
                     },
+                    scale: {
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    },
                   }}
-                />
-
-                {/* Product card with gradient border */}
-                <motion.div
-                  className="relative w-full h-full rounded-3xl p-1 cursor-pointer group"
-                  whileHover={{ scale: 1.05 }}
                   style={{
-                    background: `linear-gradient(135deg, ${centerProducts[centerProductIndex].color})`,
+                    x: mousePosition.x * -30,
+                    y: mousePosition.y * -30,
                   }}
                 >
-                  {/* Inner product image */}
-                  <div className="relative w-full h-full rounded-3xl overflow-hidden bg-card shadow-2xl">
-                    <Image
-                      src={centerProducts[centerProductIndex].image}
-                      alt={centerProducts[centerProductIndex].name}
-                      fill
-                      sizes="200px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-
-                    {/* Shine effect */}
+                  {/* Orbital particles */}
+                  {[0, 90, 180, 270].map((angle, i) => (
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-tr from-transparent via-white to-transparent opacity-0 group-hover:opacity-20"
-                      initial={{ x: "-100%", y: "-100%" }}
-                      whileHover={{ x: "100%", y: "100%" }}
-                      transition={{ duration: 0.6 }}
-                    />
-
-                    {/* Gradient overlay at bottom */}
-                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/80 to-transparent" />
-
-                    {/* Product name */}
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <motion.p
-                        className="text-white font-bold text-sm md:text-base text-center"
-                        initial={{ y: 10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.3 }}
-                      >
-                        {centerProducts[centerProductIndex].name}
-                      </motion.p>
-                    </div>
-
-                    {/* Featured badge */}
-                    <motion.div
-                      className="absolute top-3 left-3 bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1"
-                      initial={{ scale: 0, rotate: -45 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.4, type: "spring" }}
-                    >
-                      <Star weight="fill" className="w-3 h-3" />
-                      FEATURED
-                    </motion.div>
-                  </div>
-                </motion.div>
-
-                {/* Pulse rings */}
-                {[0, 1, 2].map((i) => (
-                  <motion.div
-                    key={`center-pulse-${i}`}
-                    className={`absolute inset-0 rounded-full border-2 ${centerProducts[centerProductIndex].color.includes('purple') ? 'border-purple-500' : centerProducts[centerProductIndex].color.includes('blue') ? 'border-blue-500' : centerProducts[centerProductIndex].color.includes('orange') ? 'border-orange-500' : 'border-green-500'}`}
-                    initial={{ opacity: 0.6, scale: 1 }}
-                    animate={{
-                      opacity: [0.6, 0],
-                      scale: [1, 1.4],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      delay: i * 0.4,
-                      ease: "easeOut",
-                    }}
-                  />
-                ))}
-
-                {/* Floating particles around center product */}
-                {[0, 1, 2, 3, 4, 5].map((i) => {
-                  const angle = (i / 6) * Math.PI * 2;
-                  const distance = 110;
-                  return (
-                    <motion.div
-                      key={`center-particle-${i}`}
-                      className={`absolute w-3 h-3 rounded-full bg-gradient-to-r ${centerProducts[centerProductIndex].color}`}
+                      key={angle}
+                      className="absolute w-3 h-3 rounded-full bg-primary shadow-lg"
                       style={{
-                        left: "50%",
                         top: "50%",
-                        marginLeft: -6,
+                        left: "50%",
                         marginTop: -6,
+                        marginLeft: -6,
                       }}
                       animate={{
-                        x: [
-                          Math.cos(angle) * distance,
-                          Math.cos(angle + 0.5) * (distance + 10),
-                          Math.cos(angle) * distance,
-                        ],
-                        y: [
-                          Math.sin(angle) * distance,
-                          Math.sin(angle + 0.5) * (distance + 10),
-                          Math.sin(angle) * distance,
-                        ],
+                        x: Math.cos((angle * Math.PI) / 180) * 200,
+                        y: Math.sin((angle * Math.PI) / 180) * 200,
                         scale: [1, 1.5, 1],
                         opacity: [0.6, 1, 0.6],
                       }}
                       transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        delay: i * 0.2,
-                        ease: "easeInOut",
+                        x: {
+                          duration: 8,
+                          repeat: Infinity,
+                          ease: "linear",
+                          delay: i * 0.1,
+                        },
+                        y: {
+                          duration: 8,
+                          repeat: Infinity,
+                          ease: "linear",
+                          delay: i * 0.1,
+                        },
+                        scale: {
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.2,
+                        },
+                        opacity: {
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                          delay: i * 0.2,
+                        },
                       }}
                     />
-                  );
-                })}
+                  ))}
+                </motion.div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Supporting callout badges - positioned around hero */}
+          {supportingBadges.map((badge, index) => {
+            const positions = [
+              { top: "10%", left: "-5%", rotate: -8 },
+              { top: "15%", right: "-8%", rotate: 8 },
+              { bottom: "15%", left: "-8%", rotate: -5 },
+            ];
+            const pos = positions[index];
+
+            return (
+              <motion.div
+                key={badge.label}
+                className={`absolute hidden lg:block ${getBadgeStyles(badge.type)} rounded-xl px-4 py-3 shadow-lg border backdrop-blur-sm`}
+                style={{ ...pos }}
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5 + index * 0.1, type: "spring" }}
+                whileHover={{ scale: 1.1, rotate: 0 }}
+              >
+                <div className="flex items-center gap-2">
+                  <badge.icon className="w-4 h-4" weight="fill" />
+                  <div>
+                    <div className="text-sm font-bold">{badge.label}</div>
+                    <div className="text-xs opacity-80">{badge.description}</div>
+                  </div>
+                </div>
               </motion.div>
-            </AnimatePresence>
-          </motion.div>
+            );
+          })}
 
           {/* Progress dots indicator */}
-          <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-            {productSets.map((_, index) => (
+          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 flex gap-2">
+            {heroProducts.map((_, index) => (
               <motion.button
                 key={index}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === currentProductSet
-                    ? "bg-primary w-6"
-                    : "bg-border hover:bg-primary/50"
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  index === currentProductIndex
+                    ? "bg-primary w-8"
+                    : "bg-border hover:bg-primary/50 w-2"
                 }`}
-                onClick={() => setCurrentProductSet(index)}
+                onClick={() => setCurrentProductIndex(index)}
                 whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
+                aria-label={`View product ${index + 1}`}
               />
             ))}
           </div>

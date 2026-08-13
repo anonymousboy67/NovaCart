@@ -27,11 +27,22 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(() => readStorage<CartItem[]>("novacart-cart", initialCartProductIds));
+  const [items, setItems] = useState<CartItem[]>(initialCartProductIds);
+  const [isHydrated, setIsHydrated] = useState(false);
 
+  // Load cart from localStorage after hydration
   useEffect(() => {
-    writeStorage("novacart-cart", items);
-  }, [items]);
+    const storedCart = readStorage<CartItem[]>("novacart-cart", initialCartProductIds);
+    setItems(storedCart);
+    setIsHydrated(true);
+  }, []);
+
+  // Persist cart to localStorage when it changes (but only after hydration)
+  useEffect(() => {
+    if (isHydrated) {
+      writeStorage("novacart-cart", items);
+    }
+  }, [items, isHydrated]);
 
   const addToCart = useCallback((productId: string, quantity: number = 1) => {
     const product = products.find((p) => p.id === productId);

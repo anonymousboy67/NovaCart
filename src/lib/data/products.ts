@@ -1151,9 +1151,54 @@ export function getProductsByCategory(categoryId: string) {
 }
 
 export function getRelatedProducts(product: Product, count: number = 4) {
-  return products
-    .filter((p) => p.categoryId === product.categoryId && p.id !== product.id)
-    .slice(0, count);
+  // Score products by relevance
+  const scored = products
+    .filter((p) => p.id !== product.id)
+    .map((p) => {
+      let score = 0;
+
+      // Same category is good but not the only criteria
+      if (p.categoryId === product.categoryId) score += 3;
+
+      // Shared tags are highly relevant (complementary/similar items)
+      const sharedTags = p.tags.filter((tag) => product.tags.includes(tag));
+      score += sharedTags.length * 5;
+
+      // Same brand suggests compatibility or user preference
+      if (p.brand === product.brand) score += 2;
+
+      // Similar price range (within 30%) suggests comparable quality/tier
+      const priceRatio = Math.max(p.price, product.price) / Math.min(p.price, product.price);
+      if (priceRatio <= 1.3) score += 2;
+
+      // Trending or bestseller items are safe recommendations
+      if (p.isTrending || p.isBestSeller) score += 1;
+
+      // In stock items only
+      if (p.stock === 0) score = 0;
+
+      return { product: p, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, count)
+    .map((item) => item.product);
+
+  // If we don't have enough relevant products, fill with same category
+  if (scored.length < count) {
+    const fallback = products
+      .filter(
+        (p) =>
+          p.categoryId === product.categoryId &&
+          p.id !== product.id &&
+          !scored.find((s) => s.id === p.id) &&
+          p.stock > 0
+      )
+      .slice(0, count - scored.length);
+    return [...scored, ...fallback];
+  }
+
+  return scored;
 }
 
 export const featuredProducts = products.filter((p) => p.isBestSeller || p.isTrending).slice(0, 8);

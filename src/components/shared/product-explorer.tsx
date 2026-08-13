@@ -2,17 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FadersHorizontal, MagnifyingGlass } from "@phosphor-icons/react/ssr";
+import { FadersHorizontal, MagnifyingGlass, SquaresFour, List } from "@phosphor-icons/react/ssr";
 import { Product } from "@/lib/types";
 import { products as allProducts } from "@/lib/data/products";
 import { ProductCard } from "@/components/shared/product-card";
 import { ProductFilters, DEFAULT_MAX_PRICE, type Filters } from "@/components/shared/product-filters";
+import { ActiveFilters } from "@/components/shared/active-filters";
 import { SortDropdown, type SortOption } from "@/components/shared/sort-dropdown";
 import { Pagination } from "@/components/shared/pagination";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 12;
 
@@ -34,6 +36,8 @@ function sortProducts(items: Product[], sort: SortOption): Product[] {
   }
 }
 
+type ViewMode = "grid" | "list";
+
 /**
  * Renders the results grid and its own pagination state. Keyed by the parent
  * on the active filters/sort/query so that changing any of them remounts
@@ -42,10 +46,12 @@ function sortProducts(items: Product[], sort: SortOption): Product[] {
 function ResultsGrid({
   products,
   loading,
+  viewMode,
   onClearFilters,
 }: {
   products: Product[];
   loading: boolean;
+  viewMode: ViewMode;
   onClearFilters: () => void;
 }) {
   const [page, setPage] = useState(1);
@@ -54,7 +60,11 @@ function ResultsGrid({
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+      <div className={cn(
+        viewMode === "grid"
+          ? "grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4"
+          : "flex flex-col gap-4"
+      )}>
         {Array.from({ length: 8 }).map((_, i) => (
           <div key={i} className="flex flex-col gap-3">
             <Skeleton className="aspect-square w-full rounded-xl" />
@@ -83,9 +93,19 @@ function ResultsGrid({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+      <div
+        className={cn(
+          viewMode === "grid"
+            ? "grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4"
+            : "flex flex-col gap-4"
+        )}
+      >
         {paginated.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            className={viewMode === "list" ? "flex-row" : ""}
+          />
         ))}
       </div>
       <div className="mt-10">
@@ -99,6 +119,7 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   const [filters, setFilters] = useState<Filters>({
     categoryIds: searchParams.get("category")
@@ -106,6 +127,7 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
       : [],
     maxPrice: DEFAULT_MAX_PRICE,
     minRating: 0,
+    inStockOnly: false,
   });
   const [sort, setSort] = useState<SortOption>(
     (searchParams.get("sort") as SortOption) ?? "relevance"
@@ -137,6 +159,9 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
     if (filters.minRating > 0) {
       items = items.filter((p) => p.rating >= filters.minRating);
     }
+    if (filters.inStockOnly) {
+      items = items.filter((p) => p.stock > 0);
+    }
 
     return sortProducts(items, sort);
   }, [filters, sort, searchQuery]);
@@ -154,7 +179,12 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  const clearFilters = () => updateFilters({ categoryIds: [], maxPrice: DEFAULT_MAX_PRICE, minRating: 0 });
+  const clearFilters = () =>
+    updateFilters({ categoryIds: [], maxPrice: DEFAULT_MAX_PRICE, minRating: 0, inStockOnly: false });
+
+  const removeCategory = (categoryId: string) => {
+    updateFilters({ ...filters, categoryIds: filters.categoryIds.filter((id) => id !== categoryId) });
+  };
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
@@ -168,6 +198,34 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
             {filtered.length} {filtered.length === 1 ? "product" : "products"}
           </p>
           <div className="flex items-center gap-2">
+            {/* View mode toggle */}
+            <div className="hidden sm:flex items-center gap-1 rounded-lg border border-border p-1">
+              <button
+                onClick={() => setViewMode("grid")}
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded transition-colors focus-ring",
+                  viewMode === "grid"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground-secondary hover:bg-background-secondary"
+                )}
+                aria-label="Grid view"
+              >
+                <SquaresFour className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={cn(
+                  "flex h-8 w-8 items-center justify-center rounded transition-colors focus-ring",
+                  viewMode === "list"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-foreground-secondary hover:bg-background-secondary"
+                )}
+                aria-label="List view"
+              >
+                <List className="h-4 w-4" />
+              </button>
+            </div>
+
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="sm" className="lg:hidden">
@@ -184,7 +242,25 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
           </div>
         </div>
 
-        <ResultsGrid key={resetKey} products={filtered} loading={loading} onClearFilters={clearFilters} />
+        {/* Active filters chips */}
+        <div className="mb-6">
+          <ActiveFilters
+            filters={filters}
+            onRemoveCategory={removeCategory}
+            onResetMaxPrice={() => updateFilters({ ...filters, maxPrice: DEFAULT_MAX_PRICE })}
+            onResetMinRating={() => updateFilters({ ...filters, minRating: 0 })}
+            onResetInStock={() => updateFilters({ ...filters, inStockOnly: false })}
+            onClearAll={clearFilters}
+          />
+        </div>
+
+        <ResultsGrid
+          key={resetKey}
+          products={filtered}
+          loading={loading}
+          viewMode={viewMode}
+          onClearFilters={clearFilters}
+        />
       </div>
     </div>
   );
