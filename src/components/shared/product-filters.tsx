@@ -1,16 +1,20 @@
 "use client";
 
 import { categories } from "@/lib/data/categories";
+import { products } from "@/lib/data/products";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RatingStars } from "@/components/shared/rating-stars";
+import { formatPrice } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
 export interface Filters {
   categoryIds: string[];
   maxPrice: number;
   minRating: number;
+  inStockOnly: boolean;
 }
 
+// Max price in USD before conversion
 export const DEFAULT_MAX_PRICE = 1500;
 
 export function ProductFilters({
@@ -29,8 +33,16 @@ export function ProductFilters({
     onChange({ ...filters, categoryIds: next });
   };
 
+  // Count products per category
+  const getCategoryCount = (categoryId: string) => {
+    return products.filter((p) => p.categoryId === categoryId).length;
+  };
+
   const hasActiveFilters =
-    filters.categoryIds.length > 0 || filters.maxPrice < DEFAULT_MAX_PRICE || filters.minRating > 0;
+    filters.categoryIds.length > 0 ||
+    filters.maxPrice < DEFAULT_MAX_PRICE ||
+    filters.minRating > 0 ||
+    filters.inStockOnly;
 
   return (
     <div className={cn("flex flex-col gap-7", className)}>
@@ -38,7 +50,9 @@ export function ProductFilters({
         <h3 className="text-sm font-bold text-foreground">Filters</h3>
         {hasActiveFilters && (
           <button
-            onClick={() => onChange({ categoryIds: [], maxPrice: DEFAULT_MAX_PRICE, minRating: 0 })}
+            onClick={() =>
+              onChange({ categoryIds: [], maxPrice: DEFAULT_MAX_PRICE, minRating: 0, inStockOnly: false })
+            }
             className="text-xs font-semibold text-primary hover:text-primary-hover"
           >
             Clear all
@@ -51,15 +65,19 @@ export function ProductFilters({
           Category
         </h4>
         <div className="flex flex-col gap-2.5">
-          {categories.map((category) => (
-            <label key={category.id} className="flex cursor-pointer items-center gap-2.5">
-              <Checkbox
-                checked={filters.categoryIds.includes(category.id)}
-                onCheckedChange={() => toggleCategory(category.id)}
-              />
-              <span className="text-sm text-foreground">{category.name}</span>
-            </label>
-          ))}
+          {categories.map((category) => {
+            const count = getCategoryCount(category.id);
+            return (
+              <label key={category.id} className="flex cursor-pointer items-center gap-2.5">
+                <Checkbox
+                  checked={filters.categoryIds.includes(category.id)}
+                  onCheckedChange={() => toggleCategory(category.id)}
+                />
+                <span className="flex-1 text-sm text-foreground">{category.name}</span>
+                <span className="text-xs text-foreground-secondary">({count})</span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
@@ -68,7 +86,7 @@ export function ProductFilters({
           <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground-secondary">
             Max Price
           </h4>
-          <span className="text-sm font-semibold text-foreground">${filters.maxPrice}</span>
+          <span className="text-sm font-semibold text-foreground">{formatPrice(filters.maxPrice)}</span>
         </div>
         <input
           type="range"
@@ -102,6 +120,19 @@ export function ProductFilters({
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground-secondary">
+          Availability
+        </h4>
+        <label className="flex cursor-pointer items-center gap-2.5">
+          <Checkbox
+            checked={filters.inStockOnly}
+            onCheckedChange={(checked) => onChange({ ...filters, inStockOnly: !!checked })}
+          />
+          <span className="text-sm text-foreground">In stock only</span>
+        </label>
       </div>
     </div>
   );

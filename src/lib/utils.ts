@@ -5,12 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatPrice(value: number, currency: string = "USD") {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: value % 1 === 0 ? 0 : 2,
-  }).format(value);
+export function formatPrice(value: number, currency: string = "NPR") {
+  // Convert USD to NPR (approximate rate: 1 USD = 133 NPR)
+  const nprValue = Math.round(value * 133);
+
+  // Use en-IN locale for Indian numbering system (lakhs) but ensure consistent rendering
+  // This prevents hydration mismatches between server and client
+  const formatted = new Intl.NumberFormat("en-IN", {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0,
+  }).format(nprValue);
+
+  // Add Rs. prefix (Rupees symbol)
+  return `Rs. ${formatted}`;
 }
 
 export function formatDate(date: string | Date) {

@@ -12,9 +12,13 @@ interface PaginationProps {
 export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
   if (totalPages <= 1) return null;
 
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1).filter(
-    (p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1
-  );
+  // Show all pages if 5 or fewer, otherwise use ellipsis logic
+  const pages =
+    totalPages <= 5
+      ? Array.from({ length: totalPages }, (_, i) => i + 1)
+      : Array.from({ length: totalPages }, (_, i) => i + 1).filter(
+          (p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1
+        );
 
   const items: (number | "ellipsis")[] = [];
   let last = 0;

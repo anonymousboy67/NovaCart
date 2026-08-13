@@ -49,7 +49,7 @@ export default async function ProductDetailsPage({
         ]}
       />
 
-      <div className="mt-6 grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+      <div className="mt-6 grid gap-10 lg:grid-cols-[1.2fr_0.8fr] xl:grid-cols-[1.3fr_0.7fr] lg:gap-14">
         <ProductGallery images={product.images} alt={product.name} />
         <ProductPurchasePanel product={product} />
       </div>
@@ -58,7 +58,10 @@ export default async function ProductDetailsPage({
 
       {related.length > 0 && (
         <div className="mt-6 border-t border-border">
-          <ProductCarousel title="You may also like" products={related} />
+          <ProductCarousel
+            title={`Similar ${category?.name ?? 'Products'} & Accessories`}
+            products={related}
+          />
         </div>
       )}
     </div>

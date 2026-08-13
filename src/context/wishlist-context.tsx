@@ -17,11 +17,22 @@ interface WishlistContextValue {
 const WishlistContext = createContext<WishlistContextValue | undefined>(undefined);
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  const [productIds, setProductIds] = useState<string[]>(() => readStorage<string[]>("novacart-wishlist", initialWishlistProductIds));
+  const [productIds, setProductIds] = useState<string[]>(initialWishlistProductIds);
+  const [isHydrated, setIsHydrated] = useState(false);
 
+  // Load wishlist from localStorage after hydration
   useEffect(() => {
-    writeStorage("novacart-wishlist", productIds);
-  }, [productIds]);
+    const storedWishlist = readStorage<string[]>("novacart-wishlist", initialWishlistProductIds);
+    setProductIds(storedWishlist);
+    setIsHydrated(true);
+  }, []);
+
+  // Persist wishlist to localStorage when it changes (but only after hydration)
+  useEffect(() => {
+    if (isHydrated) {
+      writeStorage("novacart-wishlist", productIds);
+    }
+  }, [productIds, isHydrated]);
 
   const isWishlisted = useCallback(
     (productId: string) => productIds.includes(productId),

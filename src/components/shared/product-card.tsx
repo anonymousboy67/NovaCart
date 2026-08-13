@@ -61,7 +61,7 @@ export function ProductCard({ product, className }: { product: Product; classNam
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex flex-col gap-0.5">
           <Link href={`/products/${product.slug}`} className="focus-ring rounded-sm">
-            <h3 className="line-clamp-1 text-sm font-semibold text-foreground">{product.name}</h3>
+            <h3 className="line-clamp-2 text-sm font-semibold text-foreground leading-snug">{product.name}</h3>
           </Link>
           <p className="line-clamp-1 text-xs text-foreground-secondary">{product.subtitle}</p>
         </div>
