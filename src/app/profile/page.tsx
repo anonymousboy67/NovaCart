@@ -6,7 +6,7 @@ import { orders } from "@/lib/data/orders";
 import { OrderStatusBadge } from "@/components/shared/order-status-badge";
 import { formatDate, formatPrice } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "My Profile — NovaCart" };
+export const metadata: Metadata = { title: "My Profile — PasalMandu" };
 
 export default function ProfileOverviewPage() {
   const recentOrders = orders.slice(0, 3);

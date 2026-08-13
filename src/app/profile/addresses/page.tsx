@@ -4,7 +4,7 @@ import { addresses } from "@/lib/data/user";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata: Metadata = { title: "Addresses — NovaCart" };
+export const metadata: Metadata = { title: "Addresses — PasalMandu" };
 
 export default function AddressesPage() {
   return (

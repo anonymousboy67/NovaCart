@@ -16,7 +16,7 @@ export function SearchResults() {
       </h1>
       <p className="mb-8 text-sm text-foreground-secondary">
         {query
-          ? `Showing the best matches for “${query}” across NovaCart.`
+          ? `Showing the best matches for “${query}” across PasalMandu.`
           : "Enter a search term above to get started."}
       </p>
       <ProductExplorer searchQuery={query} />

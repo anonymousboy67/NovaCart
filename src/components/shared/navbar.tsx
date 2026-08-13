@@ -43,10 +43,9 @@ export function Navbar() {
         </button>
 
         <Link href="/" className="flex shrink-0 items-center gap-2 focus-ring rounded-md">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-            N
+          <span className="font-display text-lg font-semibold tracking-tight text-foreground">
+            Pasal<span className="text-accent">Mandu</span>
           </span>
-          <span className="font-display text-lg font-semibold tracking-tight text-foreground">NovaCart</span>
         </Link>
 
         <nav className="group relative hidden shrink-0 lg:block">

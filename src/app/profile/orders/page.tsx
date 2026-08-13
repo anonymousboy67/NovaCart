@@ -8,7 +8,7 @@ import { OrderStatusBadge } from "@/components/shared/order-status-badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { formatDate, formatPrice } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Order History — NovaCart" };
+export const metadata: Metadata = { title: "Order History — PasalMandu" };
 
 export default function OrderHistoryPage() {
   if (orders.length === 0) {

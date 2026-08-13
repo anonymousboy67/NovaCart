@@ -67,7 +67,7 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
       try {
         await navigator.share({
           title: product.name,
-          text: `Check out ${product.name} on NovaCart`,
+          text: `Check out ${product.name} on PasalMandu`,
           url: window.location.href,
         });
       } catch (err) {

@@ -24,7 +24,7 @@ const columns = [
   {
     title: "Company",
     links: [
-      { label: "About NovaCart", href: "/" },
+      { label: "About PasalMandu", href: "/" },
       { label: "Careers", href: "/" },
       { label: "Sustainability", href: "/" },
       { label: "Press", href: "/" },
@@ -38,13 +38,12 @@ export function Footer() {
       <div className="container-page grid grid-cols-2 gap-10 py-14 md:grid-cols-6">
         <div className="col-span-2 flex flex-col gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-              N
+            <span className="font-display text-lg font-semibold tracking-tight text-foreground">
+              Pasal<span className="text-accent">Mandu</span>
             </span>
-            <span className="font-display text-lg font-semibold tracking-tight text-foreground">NovaCart</span>
           </Link>
           <p className="max-w-xs text-sm leading-relaxed text-foreground-secondary">
-            Thoughtfully curated products, delivered with care. NovaCart is a premium marketplace
+            Thoughtfully curated products, delivered with care. PasalMandu is a premium marketplace
             built around quality, simplicity and trust.
           </p>
           <div className="flex items-center gap-2">
@@ -98,7 +97,7 @@ export function Footer() {
 
       <div className="border-t border-border">
         <div className="container-page flex flex-col items-center justify-between gap-3 py-6 text-xs text-foreground-secondary md:flex-row">
-          <span>© {new Date().getFullYear()} NovaCart. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} PasalMandu. All rights reserved.</span>
           <div className="flex items-center gap-5">
             <Link href="/" className="hover:text-foreground">Privacy Policy</Link>
             <Link href="/" className="hover:text-foreground">Terms of Service</Link>

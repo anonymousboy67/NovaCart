@@ -4,7 +4,7 @@ import { CategoryCard } from "@/components/shared/category-card";
 import { categories } from "@/lib/data/categories";
 
 export const metadata: Metadata = {
-  title: "Categories — NovaCart",
+  title: "Categories — PasalMandu",
 };
 
 export default function CategoriesPage() {

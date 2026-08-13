@@ -4,7 +4,7 @@ import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductExplorer } from "@/components/shared/product-explorer";
 
 export const metadata: Metadata = {
-  title: "All Products — NovaCart",
+  title: "All Products — PasalMandu",
 };
 
 export default function ProductsPage() {

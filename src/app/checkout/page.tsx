@@ -223,7 +223,7 @@ export default function CheckoutPage() {
             </div>
             <DialogTitle>Order placed successfully</DialogTitle>
             <DialogDescription>
-              Thanks for shopping with NovaCart. A confirmation has been sent to your email, and you can
+              Thanks for shopping with PasalMandu. A confirmation has been sent to your email, and you can
               track delivery from your order history.
             </DialogDescription>
           </DialogHeader>

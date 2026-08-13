@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export const metadata: Metadata = { title: "Settings — NovaCart" };
+export const metadata: Metadata = { title: "Settings — PasalMandu" };
 
 export default function SettingsPage() {
   return (
@@ -53,7 +53,7 @@ export default function SettingsPage() {
       <div className="rounded-xl border border-error/30 bg-card p-6">
         <h2 className="mb-2 text-base font-bold text-foreground">Delete Account</h2>
         <p className="mb-4 text-sm text-foreground-secondary">
-          Permanently delete your NovaCart account and all associated data. This action cannot be undone.
+          Permanently delete your PasalMandu account and all associated data. This action cannot be undone.
         </p>
         <Button variant="destructive" size="sm">Delete Account</Button>
       </div>

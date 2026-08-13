@@ -1,4 +1,4 @@
-# NovaCart
+# PasalMandu
 
 A frontend-only, premium e-commerce marketplace UI — inspired by the usability of Daraz, Amazon and Apple, but with its own calm, minimal visual language. Built to be wired up to a real backend later; everything here runs on mock data.
 

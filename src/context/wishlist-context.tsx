@@ -1,10 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { products } from "@/lib/data/products";
 import { initialWishlistProductIds } from "@/lib/data/mock-state";
 import { readStorage, writeStorage } from "@/lib/utils";
-import { toast } from "sonner";
 
 interface WishlistContextValue {
   productIds: string[];
@@ -40,13 +38,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   );
 
   const toggleWishlist = useCallback((productId: string) => {
-    const product = products.find((p) => p.id === productId);
     setProductIds((prev) => {
       if (prev.includes(productId)) {
-        toast(`Removed ${product?.name ?? "item"} from wishlist`);
         return prev.filter((id) => id !== productId);
       }
-      toast.success(`Added ${product?.name ?? "item"} to wishlist`);
       return [...prev, productId];
     });
   }, []);

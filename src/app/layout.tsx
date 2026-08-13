@@ -8,9 +8,9 @@ import { Footer } from "@/components/shared/footer";
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: "NovaCart — Shop smarter, live better",
+  title: "PasalMandu — Shop smarter, live better",
   description:
-    "NovaCart is a premium marketplace for electronics, fashion, home, beauty and more — thoughtfully curated, beautifully simple.",
+    "PasalMandu is a premium marketplace for electronics, fashion, home, beauty and more — thoughtfully curated, beautifully simple.",
 };
 
 export default function RootLayout({
