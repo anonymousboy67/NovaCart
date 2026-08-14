@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FadersHorizontal, MagnifyingGlass, SquaresFour, List } from "@phosphor-icons/react/ssr";
 import { Product } from "@/lib/types";
-import { products as allProducts } from "@/lib/data/products";
+import { useProducts } from "@/context/products-context";
 import { ProductCard } from "@/components/shared/product-card";
 import { ProductFilters, DEFAULT_MAX_PRICE, type Filters } from "@/components/shared/product-filters";
 import { ActiveFilters } from "@/components/shared/active-filters";
@@ -116,6 +116,7 @@ function ResultsGrid({
 }
 
 export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
+  const { products: allProducts } = useProducts();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -164,7 +165,7 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
     }
 
     return sortProducts(items, sort);
-  }, [filters, sort, searchQuery]);
+  }, [allProducts, filters, sort, searchQuery]);
 
   const resetKey = `${JSON.stringify(filters)}|${sort}|${searchQuery ?? ""}`;
 

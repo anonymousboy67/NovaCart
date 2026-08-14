@@ -10,7 +10,7 @@ import { Ruler, X } from "@phosphor-icons/react/ssr";
 import { Button } from "@/components/ui/button";
 
 export function ProductTabs({ product, reviews }: { product: Product; reviews: Review[] }) {
-  const breakdown = getRatingBreakdown(product.id);
+  const breakdown = getRatingBreakdown(reviews);
   const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   // Check if product has size-related specs (fashion/apparel items)

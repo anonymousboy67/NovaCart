@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { products, getProductBySlug, getRelatedProducts } from "@/lib/data/products";
+import { getProductBySlug, getRelatedProducts } from "@/lib/data/products";
 import { getReviewsForProduct } from "@/lib/data/reviews";
 import { categories } from "@/lib/data/categories";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
@@ -10,17 +10,13 @@ import { ProductTabs } from "@/components/shared/product-tabs";
 import { ProductCarousel } from "@/components/shared/product-carousel";
 import { TrackRecentlyViewed } from "@/components/shared/track-recently-viewed";
 
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
-}
-
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "Product Not Found — PasalMandu" };
   return { title: `${product.name} — PasalMandu` };
 }
@@ -31,11 +27,11 @@ export default async function ProductDetailsPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const reviews = getReviewsForProduct(product.id);
-  const related = getRelatedProducts(product);
+  const reviews = getReviewsForProduct(product.id, product.rating);
+  const related = await getRelatedProducts(product);
   const category = categories.find((c) => c.id === product.categoryId);
 
   return (

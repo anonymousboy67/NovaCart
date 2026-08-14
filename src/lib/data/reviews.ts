@@ -1,5 +1,4 @@
 import { Review } from "@/lib/types";
-import { products } from "@/lib/data/products";
 
 const reviewerNames = [
   "Amelia R.", "Daniel K.", "Priya S.", "Marcus T.", "Sofia M.",
@@ -80,20 +79,14 @@ function generateReviewsForProduct(productId: string, baseRating: number, count:
   return reviews.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
-const reviewsByProduct: Record<string, Review[]> = {};
-
-products.forEach((p) => {
-  const seed = hashSeed(p.id);
+/** Deterministically generates the same mock reviews for a product on every call — no storage needed. */
+export function getReviewsForProduct(productId: string, rating: number): Review[] {
+  const seed = hashSeed(productId);
   const count = 3 + (seed % 5); // 3-7 reviews
-  reviewsByProduct[p.id] = generateReviewsForProduct(p.id, p.rating, count);
-});
-
-export function getReviewsForProduct(productId: string): Review[] {
-  return reviewsByProduct[productId] ?? [];
+  return generateReviewsForProduct(productId, rating, count);
 }
 
-export function getRatingBreakdown(productId: string) {
-  const reviews = getReviewsForProduct(productId);
+export function getRatingBreakdown(reviews: Review[]) {
   const breakdown = [5, 4, 3, 2, 1].map((star) => ({
     star,
     count: reviews.filter((r) => r.rating === star).length,

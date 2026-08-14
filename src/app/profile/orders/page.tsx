@@ -10,19 +10,26 @@ import { formatDate, formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Order History — PasalMandu" };
 
-export default function OrderHistoryPage() {
+export default async function OrderHistoryPage() {
   if (orders.length === 0) {
     return (
       <EmptyState icon={Package} title="No orders yet" description="Your past orders will show up here." />
     );
   }
 
+  const firstProducts = await Promise.all(
+    orders.map((order) => {
+      const productId = order.items[0]?.productId;
+      return productId ? getProductById(productId) : null;
+    })
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-lg font-bold text-foreground">Order History</h2>
       <div className="flex flex-col gap-4">
-        {orders.map((order) => {
-          const firstProduct = getProductById(order.items[0]?.productId);
+        {orders.map((order, i) => {
+          const firstProduct = firstProducts[i];
           return (
             <Link
               key={order.id}

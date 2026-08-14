@@ -6,12 +6,18 @@ import { RecentlyViewedSection } from "@/components/shared/recently-viewed-secti
 import { ShieldCheck, Truck, Sparkle } from "@phosphor-icons/react/ssr";
 import { categories } from "@/lib/data/categories";
 import {
-  featuredProducts,
-  trendingProducts,
-  bestSellerProducts,
+  getFeaturedProducts,
+  getTrendingProducts,
+  getBestSellerProducts,
 } from "@/lib/data/products";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [featuredProducts, trendingProducts, bestSellerProducts] = await Promise.all([
+    getFeaturedProducts(),
+    getTrendingProducts(),
+    getBestSellerProducts(),
+  ]);
+
   return (
     <>
       <HeroBanner />

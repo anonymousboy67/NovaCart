@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShoppingBag, ArrowRight } from "@phosphor-icons/react/ssr";
 import { useCart } from "@/context/cart-context";
-import { getProductById, products } from "@/lib/data/products";
+import { useProducts } from "@/context/products-context";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { CartLineItem } from "@/components/shared/cart-line-item";
 import { OrderSummary } from "@/components/shared/order-summary";
@@ -15,9 +15,10 @@ import { Button } from "@/components/ui/button";
 export default function CartPage() {
   const router = useRouter();
   const { items, updateQuantity, removeFromCart, subtotal } = useCart();
+  const { products, getById } = useProducts();
 
   const lines = items
-    .map((item) => ({ item, product: getProductById(item.productId) }))
+    .map((item) => ({ item, product: getById(item.productId) }))
     .filter((l): l is { item: typeof l.item; product: NonNullable<typeof l.product> } => Boolean(l.product));
 
   const shipping = subtotal > 50 || subtotal === 0 ? 0 : 6;

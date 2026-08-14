@@ -28,6 +28,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
   const order = getOrderById(id);
   if (!order) notFound();
 
+  const products = await Promise.all(order.items.map((item) => getProductById(item.productId)));
+
   return (
     <div className="flex flex-col gap-6">
       <Link href="/profile/orders" className="flex w-fit items-center gap-1.5 text-sm font-medium text-foreground-secondary hover:text-foreground">
@@ -57,8 +59,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="rounded-xl border border-border bg-card px-6">
-          {order.items.map((item) => {
-            const product = getProductById(item.productId);
+          {order.items.map((item, i) => {
+            const product = products[i];
             if (!product) return null;
             return (
               <div key={item.productId} className="flex gap-4 border-b border-border py-5 last:border-none">

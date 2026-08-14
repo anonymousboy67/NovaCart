@@ -1,7 +1,7 @@
 "use client";
 
 import { categories } from "@/lib/data/categories";
-import { products } from "@/lib/data/products";
+import { useProducts } from "@/context/products-context";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { formatPrice } from "@/lib/utils";
@@ -26,6 +26,7 @@ export function ProductFilters({
   onChange: (filters: Filters) => void;
   className?: string;
 }) {
+  const { products } = useProducts();
   const toggleCategory = (id: string) => {
     const next = filters.categoryIds.includes(id)
       ? filters.categoryIds.filter((c) => c !== id)

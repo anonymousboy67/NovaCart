@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { CartItem } from "@/lib/types";
-import { products } from "@/lib/data/products";
+import { useProducts } from "@/context/products-context";
 import { initialCartProductIds } from "@/lib/data/mock-state";
 import { readStorage, writeStorage } from "@/lib/utils";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { getById } = useProducts();
   const [items, setItems] = useState<CartItem[]>(initialCartProductIds);
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -45,7 +46,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items, isHydrated]);
 
   const addToCart = useCallback((productId: string, quantity: number = 1) => {
-    const product = products.find((p) => p.id === productId);
+    const product = getById(productId);
     setItems((prev) => {
       const existing = prev.find((i) => i.productId === productId);
       if (existing) {
@@ -56,7 +57,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...prev, { productId, quantity }];
     });
     toast.success(`${product?.name ?? "Item"} added to cart`);
-  }, []);
+  }, [getById]);
 
   const removeFromCart = useCallback((productId: string) => {
     setItems((prev) => prev.filter((i) => i.productId !== productId));
@@ -80,10 +81,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const subtotal = useMemo(
     () =>
       items.reduce((sum, i) => {
-        const product = products.find((p) => p.id === i.productId);
+        const product = getById(i.productId);
         return sum + (product?.price ?? 0) * i.quantity;
       }, 0),
-    [items]
+    [items, getById]
   );
 
   const value = useMemo(

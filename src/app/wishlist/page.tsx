@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Heart } from "@phosphor-icons/react/ssr";
 import { useWishlist } from "@/context/wishlist-context";
-import { getProductById } from "@/lib/data/products";
+import { useProducts } from "@/context/products-context";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductCard } from "@/components/shared/product-card";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 
 export default function WishlistPage() {
   const { productIds } = useWishlist();
+  const { getById } = useProducts();
   const products = productIds
-    .map((id) => getProductById(id))
+    .map((id) => getById(id))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
   return (

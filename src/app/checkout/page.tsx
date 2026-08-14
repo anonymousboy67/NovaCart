@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle, MapPin, Truck, CreditCard, Plus } from "@phosphor-icons/react/ssr";
 import { useCart } from "@/context/cart-context";
-import { getProductById } from "@/lib/data/products";
+import { useProducts } from "@/context/products-context";
 import { addresses } from "@/lib/data/user";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { OrderSummary } from "@/components/shared/order-summary";
@@ -36,6 +36,7 @@ const paymentMethods = [
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCart();
+  const { getById } = useProducts();
   const [addressId, setAddressId] = useState(addresses.find((a) => a.isDefault)?.id ?? addresses[0]?.id);
   const [delivery, setDelivery] = useState(deliveryMethods[0].id);
   const [payment, setPayment] = useState(paymentMethods[0].id);
@@ -46,7 +47,7 @@ export default function CheckoutPage() {
   const discount = subtotal > 200 ? 20 : 0;
 
   const lines = items
-    .map((item) => ({ item, product: getProductById(item.productId) }))
+    .map((item) => ({ item, product: getById(item.productId) }))
     .filter((l): l is { item: typeof l.item; product: NonNullable<typeof l.product> } => Boolean(l.product));
 
   const handlePlaceOrder = () => {

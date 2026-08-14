@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRecentlyViewed } from "@/context/recently-viewed-context";
-import { getProductById } from "@/lib/data/products";
+import { useProducts } from "@/context/products-context";
 import { ProductCarousel } from "@/components/shared/product-carousel";
 import { Product } from "@/lib/types";
 
 export function RecentlyViewedSection() {
   const { productIds } = useRecentlyViewed();
+  const { getById } = useProducts();
   const [products, setProducts] = useState<Product[]>([]);
   const [isClient, setIsClient] = useState(false);
 
@@ -15,10 +16,10 @@ export function RecentlyViewedSection() {
   useEffect(() => {
     setIsClient(true);
     const items = productIds
-      .map((id) => getProductById(id))
+      .map((id) => getById(id))
       .filter((p): p is NonNullable<typeof p> => Boolean(p));
     setProducts(items);
-  }, [productIds]);
+  }, [productIds, getById]);
 
   // Don't render anything until client-side hydration is complete
   if (!isClient || products.length === 0) return null;
