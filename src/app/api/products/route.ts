@@ -14,8 +14,11 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const body = await req.json();
 
-  if (!body.name || typeof body.price !== "number" || !body.categoryId) {
-    return NextResponse.json({ error: "name, price and categoryId are required" }, { status: 400 });
+  if (!body.name || typeof body.price !== "number" || !body.categoryId || !body.subcategoryId) {
+    return NextResponse.json(
+      { error: "name, price, categoryId and subcategoryId are required" },
+      { status: 400 }
+    );
   }
 
   const baseSlug = slugify(body.name);

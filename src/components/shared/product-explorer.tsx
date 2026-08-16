@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FadersHorizontal, MagnifyingGlass, SquaresFour, List } from "@phosphor-icons/react/ssr";
 import { Product } from "@/lib/types";
+import { getSubcategories } from "@/lib/data/categories";
 import { useProducts } from "@/context/products-context";
 import { ProductCard } from "@/components/shared/product-card";
 import { ProductFilters, DEFAULT_MAX_PRICE, type Filters } from "@/components/shared/product-filters";
@@ -126,6 +127,10 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
     categoryIds: searchParams.get("category")
       ? [searchParams.get("category") as string]
       : [],
+    subcategoryIds: searchParams.get("subcategory")
+      ? [searchParams.get("subcategory") as string]
+      : [],
+    brands: searchParams.get("brand") ? [searchParams.get("brand") as string] : [],
     maxPrice: DEFAULT_MAX_PRICE,
     minRating: 0,
     inStockOnly: false,
@@ -156,6 +161,12 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
     if (filters.categoryIds.length > 0) {
       items = items.filter((p) => filters.categoryIds.includes(p.categoryId));
     }
+    if (filters.subcategoryIds.length > 0) {
+      items = items.filter((p) => filters.subcategoryIds.includes(p.subcategoryId ?? ""));
+    }
+    if (filters.brands.length > 0) {
+      items = items.filter((p) => filters.brands.includes(p.brand));
+    }
     items = items.filter((p) => p.price <= filters.maxPrice);
     if (filters.minRating > 0) {
       items = items.filter((p) => p.rating >= filters.minRating);
@@ -177,14 +188,48 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
     } else {
       params.delete("category");
     }
+    if (next.subcategoryIds.length === 1) {
+      params.set("subcategory", next.subcategoryIds[0]);
+    } else {
+      params.delete("subcategory");
+    }
+    if (next.brands.length === 1) {
+      params.set("brand", next.brands[0]);
+    } else {
+      params.delete("brand");
+    }
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
   const clearFilters = () =>
-    updateFilters({ categoryIds: [], maxPrice: DEFAULT_MAX_PRICE, minRating: 0, inStockOnly: false });
+    updateFilters({
+      categoryIds: [],
+      subcategoryIds: [],
+      brands: [],
+      maxPrice: DEFAULT_MAX_PRICE,
+      minRating: 0,
+      inStockOnly: false,
+    });
 
   const removeCategory = (categoryId: string) => {
-    updateFilters({ ...filters, categoryIds: filters.categoryIds.filter((id) => id !== categoryId) });
+    const nextCategoryIds = filters.categoryIds.filter((id) => id !== categoryId);
+    const validSubIds = nextCategoryIds.flatMap((c) => getSubcategories(c).map((s) => s.id));
+    updateFilters({
+      ...filters,
+      categoryIds: nextCategoryIds,
+      subcategoryIds: filters.subcategoryIds.filter((id) => validSubIds.includes(id)),
+    });
+  };
+
+  const removeSubcategory = (subcategoryId: string) => {
+    updateFilters({
+      ...filters,
+      subcategoryIds: filters.subcategoryIds.filter((id) => id !== subcategoryId),
+    });
+  };
+
+  const removeBrand = (brand: string) => {
+    updateFilters({ ...filters, brands: filters.brands.filter((b) => b !== brand) });
   };
 
   return (
@@ -248,6 +293,8 @@ export function ProductExplorer({ searchQuery }: { searchQuery?: string }) {
           <ActiveFilters
             filters={filters}
             onRemoveCategory={removeCategory}
+            onRemoveSubcategory={removeSubcategory}
+            onRemoveBrand={removeBrand}
             onResetMaxPrice={() => updateFilters({ ...filters, maxPrice: DEFAULT_MAX_PRICE })}
             onResetMinRating={() => updateFilters({ ...filters, minRating: 0 })}
             onResetInStock={() => updateFilters({ ...filters, inStockOnly: false })}

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Plus, Trash, X, UploadSimple } from "@phosphor-icons/react/ssr";
 import { toast } from "sonner";
 import { Product, ProductSpec } from "@/lib/types";
-import { categories } from "@/lib/data/categories";
+import { categories, getSubcategories } from "@/lib/data/categories";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -26,6 +26,7 @@ const EMPTY: ProductFormValues = {
   subtitle: "",
   brand: "",
   categoryId: categories[0]?.id ?? "",
+  subcategoryId: getSubcategories(categories[0]?.id ?? "")[0]?.id ?? "",
   price: 0,
   originalPrice: undefined,
   stock: 0,
@@ -49,11 +50,20 @@ export function ProductForm({ product }: { product?: Product }) {
   );
   const [tagsInput, setTagsInput] = useState(product?.tags.join(", ") ?? "");
   const [colorsInput, setColorsInput] = useState(product?.colors?.join(", ") ?? "");
+  const [sizesInput, setSizesInput] = useState(product?.sizes?.join(", ") ?? "");
+  const subcategories = getSubcategories(values.categoryId);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const set = <K extends keyof ProductFormValues>(key: K, value: ProductFormValues[K]) =>
     setValues((prev) => ({ ...prev, [key]: value }));
+
+  const setCategory = (categoryId: string) =>
+    setValues((prev) => ({
+      ...prev,
+      categoryId,
+      subcategoryId: getSubcategories(categoryId)[0]?.id ?? "",
+    }));
 
   const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
@@ -101,6 +111,7 @@ export function ProductForm({ product }: { product?: Product }) {
       ...values,
       tags: tagsInput.split(",").map((t) => t.trim()).filter(Boolean),
       colors: colorsInput.split(",").map((c) => c.trim()).filter(Boolean),
+      sizes: sizesInput.split(",").map((s) => s.trim()).filter(Boolean),
       originalPrice: values.originalPrice || undefined,
       specs: values.specs.filter((s) => s.label.trim() && s.value.trim()),
     };
@@ -180,11 +191,8 @@ export function ProductForm({ product }: { product?: Product }) {
           <Field label="Subtitle" className="sm:col-span-2">
             <Input value={values.subtitle} onChange={(e) => set("subtitle", e.target.value)} />
           </Field>
-          <Field label="Brand">
-            <Input value={values.brand} onChange={(e) => set("brand", e.target.value)} />
-          </Field>
           <Field label="Category">
-            <Select value={values.categoryId} onValueChange={(v) => set("categoryId", v)}>
+            <Select value={values.categoryId} onValueChange={setCategory}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
@@ -196,6 +204,23 @@ export function ProductForm({ product }: { product?: Product }) {
                 ))}
               </SelectContent>
             </Select>
+          </Field>
+          <Field label="Subcategory">
+            <Select value={values.subcategoryId} onValueChange={(v) => set("subcategoryId", v)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select subcategory" />
+              </SelectTrigger>
+              <SelectContent>
+                {subcategories.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    {s.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Brand" className="sm:col-span-2">
+            <Input value={values.brand} onChange={(e) => set("brand", e.target.value)} />
           </Field>
         </div>
         <Field label="Description">
@@ -284,6 +309,9 @@ export function ProductForm({ product }: { product?: Product }) {
           </Field>
           <Field label="Colors (comma-separated, optional)">
             <Input value={colorsInput} onChange={(e) => setColorsInput(e.target.value)} placeholder="Black, White" />
+          </Field>
+          <Field label="Sizes (comma-separated, optional)">
+            <Input value={sizesInput} onChange={(e) => setSizesInput(e.target.value)} placeholder="S, M, L, XL" />
           </Field>
         </div>
         <div className="flex flex-wrap gap-6">

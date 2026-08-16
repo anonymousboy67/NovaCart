@@ -1,6 +1,6 @@
 "use client";
 
-import { categories } from "@/lib/data/categories";
+import { categories, getSubcategories } from "@/lib/data/categories";
 import { useProducts } from "@/context/products-context";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RatingStars } from "@/components/shared/rating-stars";
@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 
 export interface Filters {
   categoryIds: string[];
+  subcategoryIds: string[];
+  brands: string[];
   maxPrice: number;
   minRating: number;
   inStockOnly: boolean;
@@ -27,11 +29,32 @@ export function ProductFilters({
   className?: string;
 }) {
   const { products } = useProducts();
+
   const toggleCategory = (id: string) => {
     const next = filters.categoryIds.includes(id)
       ? filters.categoryIds.filter((c) => c !== id)
       : [...filters.categoryIds, id];
-    onChange({ ...filters, categoryIds: next });
+    // Drop subcategory selections that no longer belong to a checked category.
+    const validSubIds = next.flatMap((c) => getSubcategories(c).map((s) => s.id));
+    onChange({
+      ...filters,
+      categoryIds: next,
+      subcategoryIds: filters.subcategoryIds.filter((s) => validSubIds.includes(s)),
+    });
+  };
+
+  const toggleSubcategory = (id: string) => {
+    const next = filters.subcategoryIds.includes(id)
+      ? filters.subcategoryIds.filter((s) => s !== id)
+      : [...filters.subcategoryIds, id];
+    onChange({ ...filters, subcategoryIds: next });
+  };
+
+  const toggleBrand = (brand: string) => {
+    const next = filters.brands.includes(brand)
+      ? filters.brands.filter((b) => b !== brand)
+      : [...filters.brands, brand];
+    onChange({ ...filters, brands: next });
   };
 
   // Count products per category
@@ -39,8 +62,26 @@ export function ProductFilters({
     return products.filter((p) => p.categoryId === categoryId).length;
   };
 
+  // Subcategories only make sense once at least one category is picked.
+  const availableSubcategories = filters.categoryIds.flatMap((c) => getSubcategories(c));
+  const getSubcategoryCount = (subcategoryId: string) =>
+    products.filter((p) => p.subcategoryId === subcategoryId).length;
+
+  // Brands are scoped to whatever category/subcategory filters are active.
+  const brandScopedProducts = products.filter((p) => {
+    if (filters.categoryIds.length > 0 && !filters.categoryIds.includes(p.categoryId)) return false;
+    if (filters.subcategoryIds.length > 0 && !filters.subcategoryIds.includes(p.subcategoryId ?? "")) return false;
+    return true;
+  });
+  const availableBrands = Array.from(
+    new Set(brandScopedProducts.map((p) => p.brand).filter(Boolean))
+  ).sort();
+  const getBrandCount = (brand: string) => brandScopedProducts.filter((p) => p.brand === brand).length;
+
   const hasActiveFilters =
     filters.categoryIds.length > 0 ||
+    filters.subcategoryIds.length > 0 ||
+    filters.brands.length > 0 ||
     filters.maxPrice < DEFAULT_MAX_PRICE ||
     filters.minRating > 0 ||
     filters.inStockOnly;
@@ -52,7 +93,14 @@ export function ProductFilters({
         {hasActiveFilters && (
           <button
             onClick={() =>
-              onChange({ categoryIds: [], maxPrice: DEFAULT_MAX_PRICE, minRating: 0, inStockOnly: false })
+              onChange({
+                categoryIds: [],
+                subcategoryIds: [],
+                brands: [],
+                maxPrice: DEFAULT_MAX_PRICE,
+                minRating: 0,
+                inStockOnly: false,
+              })
             }
             className="text-xs font-semibold text-primary hover:text-primary-hover"
           >
@@ -81,6 +129,52 @@ export function ProductFilters({
           })}
         </div>
       </div>
+
+      {availableSubcategories.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground-secondary">
+            Subcategory
+          </h4>
+          <div className="flex flex-col gap-2.5">
+            {availableSubcategories.map((subcategory) => {
+              const count = getSubcategoryCount(subcategory.id);
+              return (
+                <label key={subcategory.id} className="flex cursor-pointer items-center gap-2.5">
+                  <Checkbox
+                    checked={filters.subcategoryIds.includes(subcategory.id)}
+                    onCheckedChange={() => toggleSubcategory(subcategory.id)}
+                  />
+                  <span className="flex-1 text-sm text-foreground">{subcategory.name}</span>
+                  <span className="text-xs text-foreground-secondary">({count})</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {availableBrands.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-foreground-secondary">
+            Brand
+          </h4>
+          <div className="flex flex-col gap-2.5">
+            {availableBrands.map((brand) => {
+              const count = getBrandCount(brand);
+              return (
+                <label key={brand} className="flex cursor-pointer items-center gap-2.5">
+                  <Checkbox
+                    checked={filters.brands.includes(brand)}
+                    onCheckedChange={() => toggleBrand(brand)}
+                  />
+                  <span className="flex-1 text-sm text-foreground">{brand}</span>
+                  <span className="text-xs text-foreground-secondary">({count})</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">

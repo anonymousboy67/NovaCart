@@ -1,13 +1,15 @@
 "use client";
 
 import { X } from "@phosphor-icons/react/ssr";
-import { categories } from "@/lib/data/categories";
+import { categories, getSubcategories } from "@/lib/data/categories";
 import { Filters, DEFAULT_MAX_PRICE } from "@/components/shared/product-filters";
 import { formatPrice } from "@/lib/utils";
 
 interface ActiveFiltersProps {
   filters: Filters;
   onRemoveCategory: (categoryId: string) => void;
+  onRemoveSubcategory: (subcategoryId: string) => void;
+  onRemoveBrand: (brand: string) => void;
   onResetMaxPrice: () => void;
   onResetMinRating: () => void;
   onResetInStock: () => void;
@@ -17,6 +19,8 @@ interface ActiveFiltersProps {
 export function ActiveFilters({
   filters,
   onRemoveCategory,
+  onRemoveSubcategory,
+  onRemoveBrand,
   onResetMaxPrice,
   onResetMinRating,
   onResetInStock,
@@ -24,6 +28,8 @@ export function ActiveFilters({
 }: ActiveFiltersProps) {
   const hasActiveFilters =
     filters.categoryIds.length > 0 ||
+    filters.subcategoryIds.length > 0 ||
+    filters.brands.length > 0 ||
     filters.maxPrice < DEFAULT_MAX_PRICE ||
     filters.minRating > 0 ||
     filters.inStockOnly;
@@ -49,6 +55,36 @@ export function ActiveFilters({
           </button>
         );
       })}
+
+      {/* Subcategory chips */}
+      {filters.subcategoryIds.map((subcategoryId) => {
+        const subcategory = filters.categoryIds
+          .flatMap((c) => getSubcategories(c))
+          .find((s) => s.id === subcategoryId);
+        if (!subcategory) return null;
+        return (
+          <button
+            key={subcategoryId}
+            onClick={() => onRemoveSubcategory(subcategoryId)}
+            className="flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20 focus-ring"
+          >
+            {subcategory.name}
+            <X className="h-3 w-3" weight="bold" />
+          </button>
+        );
+      })}
+
+      {/* Brand chips */}
+      {filters.brands.map((brand) => (
+        <button
+          key={brand}
+          onClick={() => onRemoveBrand(brand)}
+          className="flex items-center gap-1.5 rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary transition-colors hover:bg-primary/20 focus-ring"
+        >
+          {brand}
+          <X className="h-3 w-3" weight="bold" />
+        </button>
+      ))}
 
       {/* Max price chip */}
       {filters.maxPrice < DEFAULT_MAX_PRICE && (

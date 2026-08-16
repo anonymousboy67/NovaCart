@@ -28,6 +28,7 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
   const { isWishlisted, toggleWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
   const [color, setColor] = useState(product.colors?.[0]);
+  const [size, setSize] = useState(product.sizes?.[0]);
   const [pincode, setPincode] = useState("");
   const [deliveryInfo, setDeliveryInfo] = useState<{
     available: boolean;
@@ -152,7 +153,7 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
         )}
       </div>
 
-      {product.colors && (
+      {product.colors && product.colors.length > 0 && (
         <div className="flex flex-col gap-2.5">
           <span className="text-xs font-semibold uppercase tracking-wide text-foreground-secondary">
             Color: <span className="text-foreground">{color}</span>
@@ -170,6 +171,30 @@ export function ProductPurchasePanel({ product }: { product: Product }) {
                 )}
               >
                 {c}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {product.sizes && product.sizes.length > 0 && (
+        <div className="flex flex-col gap-2.5">
+          <span className="text-xs font-semibold uppercase tracking-wide text-foreground-secondary">
+            Size: <span className="text-foreground">{size}</span>
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {product.sizes.map((s) => (
+              <button
+                key={s}
+                onClick={() => setSize(s)}
+                className={cn(
+                  "rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors",
+                  size === s
+                    ? "border-primary bg-primary-light text-primary"
+                    : "border-border text-foreground-secondary hover:border-foreground/30"
+                )}
+              >
+                {s}
               </button>
             ))}
           </div>

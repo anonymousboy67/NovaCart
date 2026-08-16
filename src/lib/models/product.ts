@@ -13,6 +13,7 @@ const productSchema = new Schema(
     subtitle: { type: String, default: "" },
     brand: { type: String, default: "" },
     categoryId: { type: String, required: true },
+    subcategoryId: { type: String, default: "" },
     price: { type: Number, required: true },
     originalPrice: { type: Number },
     rating: { type: Number, default: 0 },
@@ -26,6 +27,7 @@ const productSchema = new Schema(
     isBestSeller: { type: Boolean, default: false },
     isTrending: { type: Boolean, default: false },
     colors: { type: [String], default: [] },
+    sizes: { type: [String], default: [] },
   },
   { timestamps: true, suppressReservedKeysWarning: true }
 );

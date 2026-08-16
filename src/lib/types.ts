@@ -1,3 +1,9 @@
+export interface Subcategory {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -6,6 +12,7 @@ export interface Category {
   image?: string; // category image URL
   productCount: number;
   description: string;
+  subcategories: Subcategory[];
 }
 
 export interface Review {
@@ -32,6 +39,7 @@ export interface Product {
   subtitle: string;
   brand: string;
   categoryId: string;
+  subcategoryId?: string;
   price: number;
   originalPrice?: number;
   rating: number;
@@ -45,6 +53,7 @@ export interface Product {
   isBestSeller?: boolean;
   isTrending?: boolean;
   colors?: string[];
+  sizes?: string[];
 }
 
 export interface CartItem {

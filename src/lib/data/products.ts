@@ -12,6 +12,7 @@ interface ProductRecord {
   subtitle?: string;
   brand?: string;
   categoryId: string;
+  subcategoryId?: string;
   price: number;
   originalPrice?: number;
   rating?: number;
@@ -25,6 +26,7 @@ interface ProductRecord {
   isBestSeller?: boolean;
   isTrending?: boolean;
   colors?: string[];
+  sizes?: string[];
 }
 
 function toProduct(doc: ProductRecord): Product {
@@ -35,6 +37,7 @@ function toProduct(doc: ProductRecord): Product {
     subtitle: doc.subtitle ?? "",
     brand: doc.brand ?? "",
     categoryId: doc.categoryId,
+    subcategoryId: doc.subcategoryId || undefined,
     price: doc.price,
     originalPrice: doc.originalPrice ?? undefined,
     rating: doc.rating ?? 0,
@@ -48,6 +51,7 @@ function toProduct(doc: ProductRecord): Product {
     isBestSeller: doc.isBestSeller,
     isTrending: doc.isTrending,
     colors: doc.colors,
+    sizes: doc.sizes,
   };
 }
 
@@ -72,6 +76,12 @@ export async function getProductById(id: string): Promise<Product | null> {
 export async function getProductsByCategory(categoryId: string): Promise<Product[]> {
   await connectDB();
   const docs = await ProductModel.find({ categoryId }).lean();
+  return docs.map(toProduct);
+}
+
+export async function getProductsBySubcategory(subcategoryId: string): Promise<Product[]> {
+  await connectDB();
+  const docs = await ProductModel.find({ subcategoryId }).lean();
   return docs.map(toProduct);
 }
 
