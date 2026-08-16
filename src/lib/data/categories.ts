@@ -20,7 +20,15 @@ export const categories: Category[] = [
     image: "https://images.unsplash.com/photo-1519558260268-cde7e03a0152?w=600&h=400&fit=crop&q=80",
     productCount: 8,
     description: "Phones, audio, laptops and everyday tech",
-    subcategories: subs("electronics", ["Phones", "Laptops", "Audio", "Wearables", "Accessories"]),
+    subcategories: subs("electronics", [
+      "Phones",
+      "Laptops",
+      "Audio",
+      "Cameras",
+      "TVs & Displays",
+      "Wearables",
+      "Accessories",
+    ]),
   },
   {
     id: "fashion",
