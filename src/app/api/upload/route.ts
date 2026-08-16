@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
+import { put } from "@vercel/blob";
 import { randomUUID } from "crypto";
 
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/avif"]);
@@ -21,10 +20,14 @@ export async function POST(req: NextRequest) {
   }
 
   const ext = file.type.split("/")[1];
-  const filename = `${randomUUID()}.${ext}`;
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadsDir, { recursive: true });
-  await writeFile(path.join(uploadsDir, filename), Buffer.from(await file.arrayBuffer()));
+  const filename = `uploads/${randomUUID()}.${ext}`;
 
-  return NextResponse.json({ url: `/uploads/${filename}` }, { status: 201 });
+  // Persistent object storage — Vercel's serverless functions don't have a
+  // writable, durable filesystem, so writing to public/ at runtime doesn't work.
+  const blob = await put(filename, file, {
+    access: "public",
+    contentType: file.type,
+  });
+
+  return NextResponse.json({ url: blob.url }, { status: 201 });
 }
